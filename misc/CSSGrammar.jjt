@@ -1,0 +1,324 @@
+options
+{
+	STATIC=false;
+}
+
+PARSER_BEGIN(CSSGrammar)
+package textlayout.grammar;
+
+import java.io.*;
+
+public class CSSGrammar
+{
+  public static void main(String args[]) throws Exception 
+  {
+    CSSGrammar parser = new CSSGrammar(System.in);
+//    BufferedReader br=new BufferedReader(new InputStreamReader(System.in));    
+//    CSSGrammar parser = new CSSGrammar(new StringReader(br.readLine()));
+    SimpleNode n=parser.Stylesheet();
+    n.dump("");
+  }
+}
+
+PARSER_END(CSSGrammar)
+
+SKIP :
+{
+  <MULTICOMMENT: "/*" (~["*"])* ("*")+ ( ~["/","*"] (~["*"])* ("*")+)* "/" <w> >
+}
+
+TOKEN :
+{
+  <IDENT: <ident> >
+|
+  <ATKEYWORD: "@" <ident> >
+|
+  <STRING: <string> >
+|
+  <INVALID: <invalid> >
+|
+  <HASH: "#" <name> >
+|
+	<NUMBER: <num> >
+|
+	<PERCENTAGE: <num> "%" >
+|
+	<DIMENSION: <num> <ident> >
+|
+  <PRIORITY: "!important" >
+| 
+	<C_SEMICOLON: ";" >
+|
+	<C_LBRACE: "{" >
+|
+	<C_RBRACE: "}" >
+|
+	<C_LPAREN: "(" >
+|
+	<C_RPAREN: ")" >
+|
+	<C_LSQUARE: "[" >
+|
+	<C_RSQUARE: "]" >
+|
+  <C_COMMA: ",">
+|
+  <C_EQUALS: "=">
+|
+  <C_PLUS: "+">
+|
+  <C_RANGLE: ">">
+|
+	<S: ([" ","\t","\r","\n","\f"])+ >
+|	
+	<DASHMATCH: "|=" >
+|
+	<INCLUDES: "~=" >
+|
+  <#ident: ("-")? <nmstart> (<nmchar>)* >
+|
+	<#name: (<nmchar>)+ >
+|
+  <#nmstart: 
+    ["_","A"-"Z","a"-"z"] 
+    | <nonascii> 
+    | <escape> 
+    > 
+|
+	<#nonascii: ~["\u0000"-"\u007f"] >
+| 
+  <#unicode: "\\" ["0"-"9","a"-"f"] (["0"-"9","a"-"f"] (["0"-"9","a"-"f"] 
+  		(["0"-"9","a"-"f"] (["0"-"9","a"-"f"] (["0"-"9","a"-"f"] )?)?)?)?)? 
+  		("\r\n" | [" ","\n","\r","\t","\f"])?  		
+  		>
+|
+	<#escape: 
+		<unicode> 
+		| "\\" ~["\n","\r","\f","0"-"9","a"-"f"]
+		>
+|
+  <#nmchar: 
+    ["_","A"-"Z","a"-"z","0"-"9","-"] 
+    | <nonascii> 
+    | <escape> 
+    > 
+| 
+	<#num: ("-")? ((["0"-"9"])+ | (["0"-"9"])* "." (["0"-"9"])+) >
+|
+  <#string: <string1> | <string2> >
+|
+  <#string1: "\"" ( ~["\n","\r","\f","\\","\""] | "\\" <nl> | <escape> )* "\"" >
+|
+  <#string2: "\'" ( ~["\n","\r","\f","\\","\'"] | "\\" <nl> | <escape> )* "\'" >
+|
+  <#invalid: <invalid1> | <invalid2> >
+|
+  <#invalid1: "\"" ( ~["\n","\r","\f","\\","\""] | "\\" <nl> | <escape> )* >
+|
+  <#invalid2: "\'" ( ~["\n","\r","\f","\\","\'"] | "\\" <nl> | <escape> )* >
+|  
+	<#nl: "\n" | "\r\n" | "\r" | "\f" >
+|
+	<#w: ([" ","\t","\r","\n","\f"])* >
+|
+	<C_STAR: "*">
+|
+	<C_DOT: ".">
+|
+	<C_COLON: ":">
+|
+	<C_OTHER: (["\u0000"-"\u007f"]) > 
+}
+
+SimpleNode Stylesheet() :
+{}
+{
+  (<S>)? (Statement())* <EOF>
+  { return jjtThis; }
+}
+
+void Statement() #void:
+{}
+{
+	Ruleset() | AtRule()
+}
+
+void AtRule() :
+{ Token t; }
+{
+	t=<ATKEYWORD> (<S>)? (Any())* (Block() | ";" (<S>)? )
+  {
+    jjtThis.setName(t.image);
+	  jjtThis.setPos(t.beginLine,t.beginColumn);
+  }  
+}
+
+void Block() :
+{}
+{
+"{" (<S>)? ( Any() | Block() | <ATKEYWORD> (<S>)? | ";" (<S>)? )* "}" (<S>)?
+}
+
+void Ruleset() :
+{ }
+{
+	Selector() 
+	{
+	  jjtThis.setPos(token.beginLine,token.beginColumn);
+	}
+	("," (<S>)? Selector())* 
+	"{" (<S>)? (Declaration())? ( ";" (<S>)? (Declaration())? )* "}" (<S>)?
+}
+
+void Selector() :
+{}
+{ 
+  SubSelector()
+}
+
+void SubSelector() #void : 
+{}
+{ 
+  SelectorPart()   
+  (
+    <S> ( Combinator() SubSelector() | SubSelector() )?
+    | Combinator() SubSelector()
+  )?
+}
+
+void SelectorPart() :
+{}
+{
+  ElementName() ( Id() | Class() | Attrib() | Pseudo() )*
+  | ( Id() | Class() | Attrib() | Pseudo() )+
+}
+
+void ElementName() : 
+{
+	Token t;
+}
+{
+  <C_STAR>
+  {
+    jjtThis.setName("*");
+  }
+  |
+  t=<IDENT>
+  {
+    jjtThis.setName(t.image);
+  }  
+}
+
+void Id() :
+{ Token t; }
+{
+  t=<HASH>
+  {
+  	  jjtThis.setName(t.image);
+  }
+}
+
+void Class() :
+{ Token t; }
+{
+  <C_DOT> t=<IDENT>
+  {
+    jjtThis.setName(t.image);
+  }
+}
+
+void Attrib() :
+{ Token t1,t2; }
+{
+	"[" (<S>)? t1=<IDENT> (<S>)? 
+	{
+		jjtThis.setName(t1.image);
+	}
+	(
+	  ( "=" { jjtThis.setType("="); } 
+	  		| <DASHMATCH> { jjtThis.setType("~="); } 
+	  		| <INCLUDES> { jjtThis.setType("|="); } 
+	  	) 
+	  	(<S>)?
+	  ( t2=<IDENT> | t2=<STRING> ) 
+	  { jjtThis.setValue(t2.image); }
+	  (<S>)? 
+	)? 
+	"]"	
+}
+
+void Pseudo() :
+{ Token t; }
+{
+  <C_COLON> t=<IDENT> 
+  {
+    jjtThis.setName(t.image);
+  }
+}
+
+void Combinator() :
+{}
+{
+	"+" (<S>)?
+	{
+	  jjtThis.setName("+");
+	}
+	| ">" (<S>)?
+	{
+	  jjtThis.setName(">");
+	}
+}
+
+void Declaration() :
+{}
+{
+	Property() 
+	{
+	  jjtThis.setPos(token.beginLine,token.beginColumn);
+	}
+	(<S>)? ":" (<S>)? Value() (Priority())?
+}
+
+void Priority() :
+{}
+{
+  <PRIORITY> (<S>)?
+}
+
+void Property() :
+{ Token t; }
+{
+	t=<IDENT>
+	{
+	  jjtThis.setName(t.image);
+  }
+}
+
+void Value() :
+{}
+{
+	(Any())+
+}
+
+void Any() :
+{ Token t; }
+{
+	(
+		t=<STRING> 
+		{
+		  jjtThis.setName(t.image.substring(1,t.image.length()-1));
+	  }
+	  |
+		( t=<IDENT> | t=<NUMBER> | t=<PERCENTAGE> | t=<DIMENSION>
+			| t=<HASH>	 
+			| t=<C_LPAREN> | t=<C_RPAREN> | t=<C_LSQUARE> | t=<C_RSQUARE> 
+			| t=<C_COMMA> | t=<C_EQUALS> | t=<C_PLUS> | t=<C_RANGLE> 
+			| t=<C_STAR> | t=<C_COLON> | t=<C_DOT> 
+			| 	t=<C_OTHER>
+		)
+		{
+		  jjtThis.setName(t.image);
+	  }
+	)
+	(<S>)?
+}

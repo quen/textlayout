@@ -1,0 +1,74 @@
+para,line,head,small,centre,center,right
+{
+	type:block;
+}
+em,mono,strong,link,s
+{
+	type:inline;
+}
+
+@rgb fg "Text" rgb(0,0,0);
+@rgb bg "Background" #ffffff;
+@rgb link "Hyperlinks" #00f;
+
+/* Root values for all the 'inherit' properties */
+_root
+{
+	font-name:default;
+	font-size:default;
+/*	font-name:Verdana,SansSerif;
+	font-size:13;*/
+	font-weight:normal;
+	font-style:normal;
+	font-underline:none;
+	text-rgb:_windowText;
+	text-align:left;
+	wrap-style:normal;
+	text-background-rgb:transparent;
+}
+
+/* Special value for scrolling layout root settings */
+_scrolling
+{
+	background-rgb:bg;
+}
+
+em
+{
+	font-style:italic;
+}
+strong
+{
+	font-weight:bold;
+}
+link
+{
+	text-rgb:link;
+	font-underline:solid;
+}
+mono
+{
+	font-name:"Andale Mono",Monaco,"Courier New",Monospaced;
+}
+para
+{
+	gap-bottom:0.4f;
+}
+centre,center
+{
+	text-align:centre;
+}
+right
+{
+	text-align:right;
+}
+head
+{
+	gap-top:0.6f;
+	gap-bottom:0.4f;
+	font-weight:bold;
+}
+small,s
+{
+	font-size:0.8f;
+}

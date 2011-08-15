@@ -1,0 +1,52 @@
+<project name="textlayout" default="build" basedir=".">
+	<description>
+		Buildfile for textlayout library.
+	</description>
+	
+  <property name="build" location="${java.io.tmpdir}/build/textlayout"/>
+  <property name="target" location="${user.home}/Desktop/textlayout.jar"/>
+
+	<!-- 
+	  Set this to the location of a JavaCC 4.0 installation (i.e. the folder
+	  name at the end should probably be 'javac-4.0'). May also work with newer
+	  versions but not tested.
+	  http://javacc.java.net/
+	  -->
+	<property name="javacc.home" location="${user.home}/bin/javacc-4.0"/>
+	
+  <target name="init">
+    <delete dir="${build}" quiet="true"/>
+    <mkdir dir="${build}"/>
+  </target>
+
+	<target name="grammar" depends="init">
+    <delete dir="gen/textlayout/grammar" quiet="true"/>
+    <mkdir dir="gen/textlayout/grammar"/>
+    <copy file="misc/SimpleNode.java" todir="gen/textlayout/grammar"/>
+    <jjtree target="misc/CSSGrammar.jjt" javacchome="${javacc.home}"
+   		outputdirectory="gen/textlayout/grammar"/>
+		<javacc target="gen/textlayout/grammar/CSSGrammar.jj" javacchome="${javacc.home}"
+		  outputdirectory="gen/textlayout/grammar"/>
+    <delete file="gen/textlayout/grammar/CSSGrammar.jj"/>
+	</target>
+
+  <target name="compile" depends="grammar">
+    <javac destdir="${build}" source="1.5" target="1.5"
+    	classpath="lib/util.jar" includeantruntime="false">
+    	<src path="src"/>
+    	<src path="gen"/>
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile">
+    <jar jarfile="${target}" basedir="${build}"/>
+  </target>
+	
+	<target name="clean">
+    <delete dir="${build}"/>
+	</target>
+
+  <target name="build" depends="jar, clean" description="Build and clean up">
+  </target>
+	
+</project>
