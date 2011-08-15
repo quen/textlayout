@@ -1,0 +1,7 @@
+Text layout formatting library required for leafChat. Supports wrapped text
+output, scrolling text, highlighting text for selection, bordered boxes,
+etc.
+
+This library uses a weird CSS-like stylesheet system for layout. No plans to
+document it better; I don't really recommend anyone else uses it (although it
+is quite powerful, so feel free if you want to try).
