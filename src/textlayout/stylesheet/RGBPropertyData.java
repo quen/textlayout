@@ -7,6 +7,9 @@ import java.awt.Color;
  */
 public class RGBPropertyData extends PropertyData
 {
+	/**
+	 * Transparent colour
+	 */
 	public final static Color TRANSPARENT=new Color(0,0,0,0);
 	
 	int opacity=255;

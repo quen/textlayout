@@ -265,16 +265,16 @@ public class StyleContext
 	{
 		if(fixed) throw new LayoutException("Cannot alter default stylesheet");
 		
-		int fileNumber=((Integer)stylesheetNumbers.get(s)).intValue();
-		//
+		int fileNumber = stylesheetNumbers.get(s);
+
 		for(Map<String, TreeSet<PropertyDeclarationInfo>> props :
 			propertyValues.values())
 		{
 			for(TreeSet<PropertyDeclarationInfo> declarations : props.values())
 			{
-				for(Iterator<?> i = declarations.iterator(); i.hasNext();)
+				for(Iterator<PropertyDeclarationInfo> i = declarations.iterator(); i.hasNext();)
 				{
-					PropertyDeclarationInfo pdi=(PropertyDeclarationInfo)i.next();
+					PropertyDeclarationInfo pdi = i.next();
 					if(pdi.file==fileNumber)
 					{
 						i.remove();
@@ -299,32 +299,45 @@ public class StyleContext
 		wipeCache();
 	}
 
+	/**
+	 * Adds a stylesheet to the context.
+	 * @param s New stylesheet
+	 * @throws LayoutException
+	 */
 	public synchronized void addStylesheet(Stylesheet s) throws LayoutException
 	{
 		addStylesheet(s,currentFile++);
 	}
 	
+	/**
+	 * Adds a stylesheet to the context.
+	 * @param s New stylesheet
+	 * @param thisFile Index of stylesheet
+	 * @throws LayoutException
+	 */
 	public synchronized void addStylesheet(Stylesheet s,int thisFile) throws LayoutException
 	{
 		if(fixed) throw new LayoutException("Cannot alter default stylesheet");
 		
 		// Give error if number is already in use, & record it
-		for(Iterator<Integer> i=stylesheetNumbers.values().iterator();i.hasNext();)
+		for(Integer i : stylesheetNumbers.values())
 		{
-			if(thisFile==((Integer)i.next()).intValue())
+			if(thisFile == i)
+			{
 				throw new LayoutException("Attempt to add stylesheet number "+thisFile+" twice");
+			}
 		}
 		stylesheetNumbers.put(s,new Integer(thisFile));
 		
 		// Add properties
-		PropertyDeclaration[] declarations=s.getPropertyDeclarations();
+		PropertyDeclaration[] declarations = s.getPropertyDeclarations();
 		for(int i=0;i<declarations.length;i++)
 		{
 			PropertyDeclaration declaration=declarations[i];
 			
 			// Get map for this property
 			Property p=declaration.getProperty();
-			Map<String, TreeSet<PropertyDeclarationInfo>> propertyMap=(Map<String, TreeSet<PropertyDeclarationInfo>>)propertyValues.get(p);
+			Map<String, TreeSet<PropertyDeclarationInfo>> propertyMap = propertyValues.get(p);
 			if(propertyMap==null)
 			{
 				propertyMap = new HashMap<String, TreeSet<PropertyDeclarationInfo>>();
@@ -333,7 +346,7 @@ public class StyleContext
 			
 			// Get list for last element name
 			String last=declaration.getLastElement();
-			TreeSet<PropertyDeclarationInfo> ts=(TreeSet<PropertyDeclarationInfo>)propertyMap.get(last);
+			TreeSet<PropertyDeclarationInfo> ts = propertyMap.get(last);
 			if(ts==null)
 			{
 				ts=new TreeSet<PropertyDeclarationInfo>();
@@ -349,7 +362,7 @@ public class StyleContext
 		for(int i=0;i<colourInfo.length;i++)
 		{			
 			String keyword=colourInfo[i].getKeyword();
-			TreeSet<RGBDeclarationInfo> ts=(TreeSet<RGBDeclarationInfo>)colours.get(keyword);
+			TreeSet<RGBDeclarationInfo> ts = colours.get(keyword);
 			if(ts==null)
 			{
 				ts=new TreeSet<RGBDeclarationInfo>();
@@ -361,12 +374,18 @@ public class StyleContext
 		wipeCache();
 	}
 	
+	/**
+	 * Gets colour.
+	 * @param keyword Colour keyword
+	 * @param opacity Opacity to use
+	 * @return Colour
+	 */
 	public synchronized Color getColour(String keyword,int opacity)
 	{
-		TreeSet<?> ts=(TreeSet<?>)colours.get(keyword);
+		TreeSet<RGBDeclarationInfo> ts = colours.get(keyword);
 		if(ts==null || ts.isEmpty()) 
 			return getColour("fg",opacity); // Default if an invalid keyword is specified
-		RGBDeclaration rgbd=((RGBDeclarationInfo)ts.first()).rb;
+		RGBDeclaration rgbd = ts.first().rb;
 		if(rgbd.getDefaultKeyword()!=null)
 			return getColour(rgbd.getDefaultKeyword(),opacity);
 		
@@ -397,21 +416,22 @@ public class StyleContext
 		if(context.length==0) context=new String[] {"_root"};
 		String last=context[context.length-1];
 		
-		Map<?, ?> propertyMap=(Map<?, ?>)propertyValues.get(p);
+		Map<String, TreeSet<PropertyDeclarationInfo>> propertyMap =
+			propertyValues.get(p);
 		if(propertyMap==null) return p.getDefaultValue();
 		
-		TreeSet[] declarations=new TreeSet[] {
-			(TreeSet<?>)propertyMap.get(stripAttributes(last)),
-			(TreeSet<?>)propertyMap.get("*")};
+		LinkedList<TreeSet<PropertyDeclarationInfo>> declarations =
+			new LinkedList<TreeSet<PropertyDeclarationInfo>>();
+		declarations.add(propertyMap.get(stripAttributes(last)));
+		declarations.add(propertyMap.get("*"));
+
 		int maxSpecificity=-1,maxFile=-1,maxFilePos=-1;
 		PropertyData pd=null;
-		for(int j=0;j<declarations.length;j++)
+		for(TreeSet<PropertyDeclarationInfo> currentDeclarations : declarations)
 		{
-			if(declarations[j]==null) continue; // E.g. no *
-			for(Iterator<?> i=declarations[j].iterator();i.hasNext();)
+			if(currentDeclarations == null) continue; // E.g. no *
+			for(PropertyDeclarationInfo pdi : currentDeclarations)
 			{
-				PropertyDeclarationInfo pdi=(PropertyDeclarationInfo)i.next();
-				
 				// Don't bother trying to match it (or anything else in this set) 
 				// if its specificity is less than something we already found
 				int specificity=pdi.pd.getSpecificity();
@@ -601,7 +621,7 @@ public class StyleContext
 	}
 	
 	/**
-	 * Obtains the value of insets
+	 * Obtains the value of insets.
 	 * @param p Array of properties (use Property.I_xx constant)
 	 * @param context Context
 	 * @return Value
@@ -619,6 +639,12 @@ public class StyleContext
 		return i;
 	}
 	
+	/**
+	 * Gets the font for a particular tag stack. 
+	 * @param context XML context as tag stack
+	 * @return Current font
+	 * @throws LayoutException
+	 */
 	public synchronized Font getFont(String[] context) throws LayoutException
 	{
 		String key=getCacheKey(context,null);

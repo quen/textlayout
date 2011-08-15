@@ -350,9 +350,8 @@ public class ScrollingLayout extends JComponent
   void fireChangeEvent()
   {
   	ChangeEvent ce=new ChangeEvent(this);
-  	for(Iterator<ChangeListener> i=lChangeListeners.iterator();i.hasNext();)
+  	for(ChangeListener cl : lChangeListeners)
   	{
-  		ChangeListener cl=(ChangeListener)i.next();
   		cl.stateChanged(ce);
   	}
   }

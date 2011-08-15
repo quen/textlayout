@@ -212,7 +212,7 @@ public class UserStylesheet
 		Element[] aeColours=XML.getChildren(d.getDocumentElement(),"colour");
 		for(int i=0;i<aeColours.length;i++)
 		{
-			String s=(String)aeColours[i].getAttribute("id");
+			String s = aeColours[i].getAttribute("id");
 			if(s!=null && s.equals(id))
 			{
 				aeColours[i].getParentNode().removeChild(aeColours[i]);

@@ -41,9 +41,8 @@ class VerticalHolderBlock implements LayoutBlock
 	@Override
 	public void updateStyle(StyleContext sc) throws LayoutException
 	{
-		for(Iterator<LayoutBlock> i=blocks.iterator();i.hasNext();)
+		for(LayoutBlock lb : blocks)
 		{
-			LayoutBlock lb=(LayoutBlock)i.next();
 			lb.updateStyle(sc);
 		}
 		width=-1;
@@ -95,7 +94,7 @@ class VerticalHolderBlock implements LayoutBlock
   {
     if(!blocks.isEmpty())
     {
-      LayoutBlock lbLast=(LayoutBlock)blocks.getLast();
+      LayoutBlock lbLast = blocks.getLast();
       if(lbLast.setCurrent(sc,false) && width!=-1)
       {
         int iBefore=lbLast.getHeight();
@@ -125,9 +124,8 @@ class VerticalHolderBlock implements LayoutBlock
 
     height = 0; 
     int leftHeight = 0;
-		for(Iterator<LayoutBlock> i=blocks.iterator(); i.hasNext();)
+		for(LayoutBlock lb : blocks)
 		{
-			LayoutBlock lb = (LayoutBlock)i.next();
       lb.reflow(width);
       switch(lb.getFlowCategory())
       {
@@ -149,7 +147,7 @@ class VerticalHolderBlock implements LayoutBlock
 	public int getFirstBaseline()
   {
 		if(blocks.size()==0) return 0;
-		return ((LayoutBlock)blocks.getFirst()).getFirstBaseline();
+		return blocks.getFirst().getFirstBaseline();
   }
 
   /**
@@ -178,9 +176,8 @@ class VerticalHolderBlock implements LayoutBlock
     if(height==-1) throw new Error("Must reflow before calling getUsedWidth");
     
     int usedWidth=0;
-		for(Iterator<LayoutBlock> i=blocks.iterator();i.hasNext();)
+		for(LayoutBlock lb : blocks)
 		{
-			LayoutBlock lb=(LayoutBlock)i.next();
       usedWidth=Math.max(usedWidth,lb.getUsedWidth());
     }
     return usedWidth;
@@ -203,9 +200,8 @@ class VerticalHolderBlock implements LayoutBlock
     if(height==-1) throw new Error("Must reflow before calling paint");
 
     int leftMarginY=y,normalY=y;
-		for(Iterator<LayoutBlock> i=blocks.iterator();i.hasNext();)
+		for(LayoutBlock lb : blocks)
 		{
-			LayoutBlock lb=(LayoutBlock)i.next();
 			int thisY,newY;
       switch(lb.getFlowCategory())
       {
@@ -231,12 +227,11 @@ class VerticalHolderBlock implements LayoutBlock
   @Override
 	public boolean setCurrent(StyleContext sc,boolean current) throws LayoutException
   {
-  		boolean change=false;
-  		for(Iterator<LayoutBlock> i=blocks.iterator();i.hasNext();)
-  		{
-  			LayoutBlock lb=(LayoutBlock)i.next();
-      change|=lb.setCurrent(sc,current);
-  		}
+		boolean change=false;
+		for(LayoutBlock lb : blocks)
+		{
+			change|=lb.setCurrent(sc,current);
+		}
     return change;
   }
   
@@ -244,9 +239,8 @@ class VerticalHolderBlock implements LayoutBlock
 	@Override
 	public void clearHighlight()
 	{
-		for(Iterator<LayoutBlock> i=blocks.iterator();i.hasNext();)
+		for(LayoutBlock lb : blocks)
 		{
-			LayoutBlock lb=(LayoutBlock)i.next();
 			lb.clearHighlight();
 		}
 	}
@@ -263,9 +257,8 @@ class VerticalHolderBlock implements LayoutBlock
 	{
 		boolean inHighlight=false,doneHighlight=false;
 		int normalY=0,leftMarginY=0;
-		for(Iterator<LayoutBlock> i=blocks.iterator();i.hasNext();)
+		for(LayoutBlock lb : blocks)
 		{
-			LayoutBlock lb=(LayoutBlock)i.next();
 			int y,newY;
       switch(lb.getFlowCategory())
       {
@@ -332,9 +325,8 @@ class VerticalHolderBlock implements LayoutBlock
 		List<LayoutThing> l)
 	{
 		int normalY=0,leftMarginY=0; 
-		for(Iterator<LayoutBlock> i=blocks.iterator();i.hasNext();)
+		for(LayoutBlock lb : blocks)
 		{
-			LayoutBlock lb=(LayoutBlock)i.next();
 			// This code is sort of copied from the equivalent in Layout (I'm not 
 			// entirely sure why Layout isn't implemented as a VerticalHolderBlock
 			// in the first place, but hey)
@@ -370,9 +362,8 @@ class VerticalHolderBlock implements LayoutBlock
 	public String getHighlightText()
 	{
 		StringBuffer sb=new StringBuffer();
-		for(Iterator<LayoutBlock> i=blocks.iterator();i.hasNext();)
+		for(LayoutBlock lb : blocks)
 		{
-			LayoutBlock lb=(LayoutBlock)i.next();
 			sb.append(lb.getHighlightText());
 
 			if(lb.getFlowCategory()==LayoutBlock.FLOWCATEGORY_LEFTMARGIN)
@@ -394,9 +385,8 @@ class VerticalHolderBlock implements LayoutBlock
 	  StringBuffer sb=new StringBuffer();
 	  sb.append(indent+"VerticalHolderBlock ["+
 	  	(context==null ? "" : StringUtils.join("/",context))+"]\n");
-		for(Iterator<LayoutBlock> i=blocks.iterator();i.hasNext();)
+		for(LayoutBlock lb : blocks)
 		{
-			LayoutBlock lb=(LayoutBlock)i.next();
 			sb.append(lb.debugDisplay(indent+"  "));
 		}
 		return sb.toString();
@@ -407,9 +397,8 @@ class VerticalHolderBlock implements LayoutBlock
 		Map<LayoutInline, LayoutInline.NodePos> translation)
 	{
 		Element thisElement=SurroundedBlock.buildXML(parent,translation,context);  
-		for(Iterator<LayoutBlock> i=blocks.iterator();i.hasNext();)
+		for(LayoutBlock lb : blocks)
 		{
-			LayoutBlock lb=(LayoutBlock)i.next();
 			lb.buildXML(thisElement,translation);
 		}
 	}
@@ -418,9 +407,8 @@ class VerticalHolderBlock implements LayoutBlock
 	public int getMinX()
 	{
 		int minX=0;
-		for(Iterator<LayoutBlock> i=blocks.iterator();i.hasNext();)
+		for(LayoutBlock lb : blocks)
 		{
-			LayoutBlock lb=(LayoutBlock)i.next();
 			minX=Math.min(minX,lb.getMinX());
 		}
 		return minX;
@@ -430,9 +418,8 @@ class VerticalHolderBlock implements LayoutBlock
 	public int getMaxX()
 	{
 		int maxX=width;
-		for(Iterator<LayoutBlock> i=blocks.iterator();i.hasNext();)
+		for(LayoutBlock lb : blocks)
 		{
-			LayoutBlock lb=(LayoutBlock)i.next();
 			maxX=Math.max(maxX,lb.getMaxX());
 		}
 		return maxX;

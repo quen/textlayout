@@ -88,7 +88,7 @@ public abstract class LayoutGenerator
 							Element ePara=eParent.getOwnerDocument().createElement("para");
 							for(Iterator<Node> i=lUncontained.iterator();i.hasNext();)
 							{
-								ePara.appendChild((Node)i.next());							
+								ePara.appendChild(i.next());							
 							}
 							lUncontained.clear();
 							eNewParent.appendChild(ePara);
@@ -97,7 +97,7 @@ public abstract class LayoutGenerator
 						{
 							for(Iterator<Node> i=lUncontained.iterator();i.hasNext();)
 							{
-								eNewParent.appendChild((Node)i.next());							
+								eNewParent.appendChild(i.next());							
 							}							
 							lUncontained.clear();
 						}
@@ -126,7 +126,7 @@ public abstract class LayoutGenerator
 				Element ePara=eParent.getOwnerDocument().createElement("para");
 				for(Iterator<Node> i=lUncontained.iterator();i.hasNext();)
 				{
-					ePara.appendChild((Node)i.next());							
+					ePara.appendChild(i.next());							
 				}
 				lUncontained.clear();
 				eNewParent.appendChild(ePara);
@@ -135,7 +135,7 @@ public abstract class LayoutGenerator
 			{
 				for(Iterator<Node> i=lUncontained.iterator();i.hasNext();)
 				{
-					eNewParent.appendChild((Node)i.next());							
+					eNewParent.appendChild(i.next());							
 				}							
 			}
 		}
@@ -213,7 +213,7 @@ public abstract class LayoutGenerator
           {
             lBlocks.add(new TextBlock(
               context,
-              (LayoutInline[])lInlines.toArray(new LayoutInline[0]),sc));
+              lInlines.toArray(new LayoutInline[lInlines.size()]),sc));
             lInlines.clear();
             bInFirstPath=true;
           }
@@ -251,14 +251,14 @@ public abstract class LayoutGenerator
     {
       lBlocks.add(new TextBlock(
         context,
-        (LayoutInline[])lInlines.toArray(new LayoutInline[0]),sc));
+        lInlines.toArray(new LayoutInline[lInlines.size()]),sc));
     }
 
     // Things actually marked as block always occupy a block; things left as
     // unknown do not.
     if(lBlocks.size()==1)
     	{
-    		LayoutBlock lbInner=(LayoutBlock)lBlocks.get(0);
+    		LayoutBlock lbInner = lBlocks.get(0);
     		return new SurroundedBlock(lbInner,context,sc);
     	}
     else if(lBlocks.size()==0)

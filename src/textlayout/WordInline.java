@@ -285,7 +285,7 @@ class WordInline implements LayoutInline
   {
   	synchronized(backgroundImages)
   	{
-  		BackgroundImage background=(BackgroundImage)backgroundImages.get(this);
+  		BackgroundImage background = backgroundImages.get(this);
   		if(background!=null) 
   			background.poke();
   		
@@ -296,9 +296,11 @@ class WordInline implements LayoutInline
   			backgroundLastExpiryRun=now;
   			for(Iterator<BackgroundImage> i=backgroundImages.values().iterator();i.hasNext();)
   			{
-				BackgroundImage old=(BackgroundImage)i.next();
-				if(now - old.lastUsed > BACKGROUNDCACHEEXPIRE)
-					i.remove();
+					BackgroundImage old = i.next();
+					if(now - old.lastUsed > BACKGROUNDCACHEEXPIRE)
+					{
+						i.remove();
+					}
   			}
   		}
 			

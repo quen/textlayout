@@ -32,10 +32,16 @@
 
   <target name="compile" depends="grammar">
     <javac destdir="${build}" source="1.5" target="1.5"
-    	classpath="lib/util.jar" includeantruntime="false">
+    	classpath="lib/util.jar" includeantruntime="false" debug="true">
     	<src path="src"/>
     	<src path="gen"/>
     </javac>
+		<copy todir="${build}">
+			<fileset dir="src">
+				<exclude name="**/*.java"/>
+				<exclude name="**/.DS_Store"/>
+			</fileset>
+		</copy>
   </target>
 
   <target name="jar" depends="compile">

@@ -88,7 +88,7 @@ class SurroundedBlock implements LayoutBlock
         List<String> l=new LinkedList<String>();
         l.add("_current");
         l.addAll(Arrays.asList(context));
-        modifiedContext=(String[])l.toArray(new String[0]);
+        modifiedContext = l.toArray(new String[l.size()]);
       }
 
       margin=sc.getInsets(Property.I_GAP,modifiedContext);
@@ -279,7 +279,7 @@ class SurroundedBlock implements LayoutBlock
 	public void buildXML(Node parent,Map<LayoutInline,
   	LayoutInline.NodePos> translation)
   {  	
-  		innerBlock.buildXML((Element)buildXML(parent,translation,context),translation);  
+  		innerBlock.buildXML(buildXML(parent,translation,context), translation);  
   }
   
   static Element buildXML(Node parent,Map<?, ?> translation,String[] context)

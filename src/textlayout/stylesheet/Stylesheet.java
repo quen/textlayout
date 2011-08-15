@@ -8,10 +8,18 @@ import textlayout.*;
 import textlayout.grammar.*;
 import util.GraphicsUtils;
 
+/**
+ * A stylesheet. (Note: these stylesheets are almost, but not quite, entirely
+ * unlike CSS.)
+ */
 public class Stylesheet
 {
 	static final String RGBKEYWORD="([a-z][a-z0-9]*)|(_[a-zA-Z]+)";
 	
+	/**
+	 * @param sheetData Stylesheet as string
+	 * @throws LayoutException
+	 */
 	public Stylesheet(String sheetData) throws LayoutException
 	{
 		this(new ByteArrayInputStream(getBytes(sheetData)));
@@ -29,6 +37,10 @@ public class Stylesheet
 		}		
 	}
 
+	/**
+	 * @param is Stylesheet as input string
+	 * @throws LayoutException
+	 */
 	public Stylesheet(InputStream is) throws LayoutException
 	{
 		try
@@ -127,15 +139,21 @@ public class Stylesheet
 		colours.add(new RGBDeclaration(keyword,c,description,defaultKeyword));
 	}
 	
+	/**
+	 * @return All declarations from stylesheet
+	 */
 	public PropertyDeclaration[] getPropertyDeclarations()
 	{
-		return (PropertyDeclaration[]) propertyDeclarations.toArray(
+		return propertyDeclarations.toArray(
 			new PropertyDeclaration[propertyDeclarations.size()]);
 	}
 	
+	/**
+	 * @return All colours from stylesheet
+	 */
 	public RGBDeclaration[] getColours()
 	{
-		return (RGBDeclaration[]) colours.toArray(new RGBDeclaration[colours.size()]);
+		return colours.toArray(new RGBDeclaration[colours.size()]);
 	}
 	
 	static String WILDCARD="!any";
@@ -154,7 +172,7 @@ public class Stylesheet
 				selectorList.add(getRuleSetSelector(child));
 			}
 		}
-		SelectorData[] selectors=(SelectorData[]) selectorList.toArray(new SelectorData[selectorList.size()]);
+		SelectorData[] selectors = selectorList.toArray(new SelectorData[selectorList.size()]);
 		
 		// For each property, add to list
 		for(int i=0;i<children.length;i++)
@@ -260,7 +278,7 @@ public class Stylesheet
 			}
 		}
 		
-		sd.parts=(String[]) parts.toArray(new String[parts.size()]);
+		sd.parts = parts.toArray(new String[parts.size()]);
 		return sd;
 	}
 	

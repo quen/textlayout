@@ -124,8 +124,8 @@ class TextBlock implements LayoutBlock
   					// Update Node pointed to by previous words
   					for(Iterator<LayoutInline> previousWords=previous.iterator();previousWords.hasNext();)
   					{
-  						LayoutInline previousWord=(LayoutInline)previousWords.next();
-  						LayoutInline.NodePos previousPos=(LayoutInline.NodePos)translation.get(previousWord);
+  						LayoutInline previousWord = previousWords.next();
+  						LayoutInline.NodePos previousPos= translation.get(previousWord);
   						translation.put(previousWord,new LayoutInline.NodePos(lastText,previousPos.getPos()));  						
   					}  					
   					previous.add(words[i]);
@@ -212,7 +212,7 @@ class TextBlock implements LayoutBlock
     
     for(int wordIndex=0;wordIndex<newWordsList.size();wordIndex++)
     {
-      LayoutInline currentWord=(LayoutInline)newWordsList.get(wordIndex);
+      LayoutInline currentWord = newWordsList.get(wordIndex);
       currentWord.setWrappedIfNecessary(LayoutInline.UNWRAPPED);
             
 			if(currentWord.skipAtLineStart() && lineStart)
@@ -230,8 +230,8 @@ class TextBlock implements LayoutBlock
       // If we're not allowed to break newWords, count following in with width
       for(int subWord=wordIndex+1;subWord<newWordsList.size();subWord++)
       {
-        if(((LayoutInline)newWordsList.get(subWord-1)).breakAfter()) break;
-        LayoutInline subWordItem=(LayoutInline)newWordsList.get(subWord);
+        if((newWordsList.get(subWord-1)).breakAfter()) break;
+        LayoutInline subWordItem = newWordsList.get(subWord);
         if(subWordItem.breakBefore()) break;
         w+=subWordItem.getWidth();
       }
@@ -240,7 +240,7 @@ class TextBlock implements LayoutBlock
       {
         // Go on to next line
         linesList.add(new Line(firstLine ? firstLineIndent : otherLineIndent,
-          (LayoutInline[])currentLine.toArray(new LayoutInline[0]),
+          currentLine.toArray(new LayoutInline[currentLine.size()]),
           maxAscent,maxDescent));
         currentLine.clear();
 
@@ -275,11 +275,11 @@ class TextBlock implements LayoutBlock
     }
     // Final line
     linesList.add(new Line(firstLine ? firstLineIndent : otherLineIndent,
-      (LayoutInline[])currentLine.toArray(new LayoutInline[0]),
+      currentLine.toArray(new LayoutInline[currentLine.size()]),
       maxAscent,maxDescent));
 
     // Convert to array
-    lines=(Line[])linesList.toArray(new Line[0]);
+    lines = linesList.toArray(new Line[linesList.size()]);
 
     // Calculate height
     height=0;
