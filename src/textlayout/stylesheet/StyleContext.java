@@ -197,9 +197,13 @@ public class StyleContext
 		initSystemRGB("_control",SystemColor.control);
 		
 		// Add default stylesheet(s)
-		addStylesheet(
-			new Stylesheet(StyleContext.class.getResourceAsStream("DefaultStylesheet.css")),
-				StyleContext.ORDER_DEFAULT);
+		InputStream defaultCss =
+			StyleContext.class.getResourceAsStream("DefaultStylesheet.css");
+		if(defaultCss == null)
+		{
+			throw new IOException("Unable to find DefaultStylesheet.css");
+		}
+		addStylesheet(new Stylesheet(defaultCss), StyleContext.ORDER_DEFAULT);
 		if(includeUserStyles)
 			addUserStylesheet();
 	}
